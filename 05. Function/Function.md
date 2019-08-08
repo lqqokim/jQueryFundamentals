@@ -121,3 +121,133 @@ function menu() { //개발자B
     }
 }());
 ```
+
+## 객체 생성자 함수의 활용
+### 객체 생성자 함수
+내장 객체를 생성할 때는 이미 자바스크립트 엔진에 내장되어 있는 객체 생성자 함수(Object Constructor Function)를 사용하여 객체를 생성한다. 이번에는 객체 생성자 함수를 선언하고 그 다음 객체를 생성해보겠다.
+
+#### 객체 생성자 함수를 선언하고 객체를 생성하는 기본형
+new 키워드를 사용해 객체를 생성하고 객체 생성자 함수에서 this 키워드를 사용해 생성한 객체에 속성과 함수를 등록한다.
+```js
+function 객체생성자함수명(매개변수1, 매개변수2, ...매개변수n) { // 객체 생성자 함수
+    this.속성명 = 새 값;
+    this.함수명 = function() {
+        // 자바스크립트 코드
+    }
+}
+
+var 참조변수(인스턴스 이름) = new 객체생성자함수명(); // 객체 생성
+
+var 참조변수 = {
+    속성: 새 값,
+    함수명: function() {
+        // ...
+    }
+}
+```
+
+#### 객체 생성자 함수를 선언하고 2개의 객체를 생성하는 예제
+```js
+function CheckWeight(name, height, weight) { // 객체 생성자의 함수명은 대문자로 시작하는 것이 관례
+    this.userName = name;
+    this.userHeight = height;
+    this.userWeight = weight;
+    this.minWeight;
+    this.maxWeight;
+    
+    this.getInfo = function() {
+        var str = "";
+        str += "이름: " + this.userName + ", ";
+        str += "키: " + this.userHeight + ", ";
+        str += "몸무게: " + this.userWeight + "<br>";
+        return str;
+    }
+
+    this.getResult = function() {
+        this.minWeight = (this.userHeight - 100) * 0.9 - 5;
+        this.maxWeight = (this.userHeight - 100) * 0.9 + 5;
+
+        if(this.userWeight >= this.minWeight) {
+            return "정상 몸무게 입니다";
+        } else if(this.userWeight < this.minWeight) {
+            return "정상 몸무게보다 미달입니다";
+        } else {
+            return "정상 몸무게보다 초과입니다";
+        }
+    }
+}
+
+var jang = new CheckWeight("장보리", 168, 62);
+var park = new CheckWeight("박달재", 180, 88);
+console.log(jang);
+console.log(park);
+
+document.write(jang.getInfo());
+document.write(jang.getResult());
+```
+
+### 메모리 절약을 위한 프로토타입 사용하기
+
+#### 프로토타입의 필요성
+위 예제와 같이 객체를 생성하게 되면 객체를 생성한 만큼 함수가 등록된다. 그리고 함수를 여러개 등록하면 메모리 공간을 많이 차지하여 메모리를 낭비하게 된다. 이런 경우에 객체 생성자 함수에 프로토타입(Prototype)을 사용하여 함수를 등록하면 메모리 낭비를 줄일 수 있다.
+
+#### 프로토타입의 의미
+![prototype](prototype.png)
+프로토타입(Prototype)의 사전적 의미는 '원형'이다. 자바스크립트에서 '원형'은 객체 생성자 함수를 의미한다. 프로토타입을 사용하여 등록한 함수는 원형(객체 생성자 함수)에서 생성된 객체를 공유할 수 있다. 즉, 여러개의 함수를 등록할 필요가 없고 결론적으로 메모리 절약이 가능하다.
+
+#### 프로토타입으로 객체를 생성할 때 함수를 등록하는 기본형
+```js
+function 함수명(매개변수1, 매개변수2, ... 매개변수n) {
+    this.속성명 = 새 값;
+}
+
+객체생성자함수명.prototype.함수명 = function() {
+    // 자바스크립트 코드
+}
+
+var 참조변수(인스턴스 이름) = new 객체생성자함수명();
+```
+
+#### 객체를 생성할 때 프로토타입으로 함수를 등록하는 예제
+```js
+function CheckWeight(name, height, weight) { // 객체 생성자의 함수명은 대문자로 시작하는 것이 관례
+    this.userName = name;
+    this.userHeight = height;
+    this.userWeight = weight;
+    this.minWeight;
+    this.maxWeight;
+}
+
+CheckWeight.prototype.getInfo = function() {
+    var str = "";
+    str += "이름: " + this.userName + ", ";
+    str += "키: " + this.userHeight + ", ";
+    str += "몸무게: " + this.userWeight + "<br>";
+    return str;
+}
+
+CheckWeight.prototype.getResult = function() {
+    this.minWeight = (this.userHeight - 100) * 0.9 - 5;
+    this.maxWeight = (this.userHeight - 100) * 0.9 + 5;
+
+    if(this.userWeight >= this.minWeight) {
+        return "정상 몸무게 입니다";
+    } else if(this.userWeight < this.minWeight) {
+        return "정상 몸무게보다 미달입니다";
+    } else {
+        return "정상 몸무게보다 초과입니다";
+    }
+}
+
+var jang = new CheckWeight("장보리", 168, 62);
+var park = new CheckWeight("박달재", 180, 88);
+console.log(jang);
+console.log(park);
+
+document.write(jang.getInfo());
+document.write(jang.getResult());
+
+document.write(jang.getReault === park.getResult);
+// 해당 값이 true라는 것은 둗 객체가 같은 함수를 사용하고 있다는 의미 
+
+```
